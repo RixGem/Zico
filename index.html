@@ -1368,7 +1368,7 @@ body {
         const frame = document.getElementById('wire-frame');
         frame.addEventListener('focusin', (event) => {
             const link = event.target.closest('.wire-link');
-            if (!link) return;
+            if (!link || !link.matches(':focus-visible')) return;
             frame.classList.add('is-browsing');
             link.scrollIntoView({ block: 'nearest' });
         });
