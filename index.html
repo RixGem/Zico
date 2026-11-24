@@ -376,6 +376,8 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .desk-sub {
@@ -388,6 +390,7 @@ body {
 
 .session-board {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 6px;
     list-style: none;
@@ -676,6 +679,13 @@ body {
     }
     .live-dot {
         animation: none;
+    }
+}
+
+/* Mid-width desks: drop the subtitle so the title never runs into the session board */
+@media (max-width: 1600px) and (min-width: 1025px) {
+    .desk-sub {
+        display: none;
     }
 }
 
