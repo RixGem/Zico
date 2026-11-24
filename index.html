@@ -198,6 +198,19 @@ body {
     animation-play-state: paused;
 }
 
+/* Keyboard browsing: stop the loop and use native scroll so the focused headline is always visible */
+.stories-frame.is-browsing .wire-track {
+    animation: none;
+}
+
+.stories-frame.is-browsing .wire-viewport {
+    overflow-y: auto;
+}
+
+.stories-frame.is-browsing .wire-list[aria-hidden="true"] {
+    display: none;
+}
+
 .wire-list {
     list-style: none;
 }
@@ -1326,6 +1339,21 @@ body {
         mountWireFallback();
     }
 
+    function setupWireKeyboardBrowsing() {
+        const frame = document.getElementById('wire-frame');
+        frame.addEventListener('focusin', (event) => {
+            const link = event.target.closest('.wire-link');
+            if (!link) return;
+            frame.classList.add('is-browsing');
+            link.scrollIntoView({ block: 'nearest' });
+        });
+        frame.addEventListener('focusout', (event) => {
+            if (!frame.contains(event.relatedTarget)) {
+                frame.classList.remove('is-browsing');
+            }
+        });
+    }
+
     function setupWireToggle() {
         const sidebar = document.getElementById('stories-sidebar');
         const btn = document.getElementById('wire-toggle');
@@ -1695,6 +1723,7 @@ body {
     });
     buildSessionBoard();
     setupWireToggle();
+    setupWireKeyboardBrowsing();
     initWire();
     initClockMarkup();
     updateClocks();
