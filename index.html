@@ -110,11 +110,6 @@ body {
     animation: livePulse 2.2s ease-in-out infinite;
 }
 
-.live-dot.amber {
-    background: var(--amber-live);
-    box-shadow: 0 0 8px rgba(245, 159, 0, 0.7);
-}
-
 .stories-frame {
     position: relative;
     width: 100%;
@@ -197,33 +192,6 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
-}
-
-.telemetry-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border: 1px solid var(--rule);
-    background: var(--bg-panel);
-    font-size: 12px;
-    color: var(--text-secondary);
-    white-space: nowrap;
-}
-
-.status-pill strong {
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.status-pill.is-fallback strong {
-    color: var(--amber-live);
 }
 
 .range-group {
@@ -706,19 +674,6 @@ body {
             </div>
 
             <div class="desk-controls">
-                <div class="telemetry-group">
-                    <div class="status-pill" id="fx-status">
-                        <span class="live-dot" aria-hidden="true"></span>
-                        <span>FX</span>
-                        <strong class="tabular" id="fx-status-text">Syncing…</strong>
-                    </div>
-                    <div class="status-pill" id="wx-status">
-                        <span class="live-dot" aria-hidden="true"></span>
-                        <span>Weather</span>
-                        <strong class="tabular" id="wx-status-text">Syncing…</strong>
-                    </div>
-                </div>
-
                 <div class="range-group" role="group" aria-label="Index chart timeframe">
                     <button type="button" class="range-btn" data-range="1D" aria-pressed="true">1D</button>
                     <button type="button" class="range-btn" data-range="1M" aria-pressed="false">1M</button>
@@ -780,7 +735,7 @@ body {
             zone: 'America/New_York',
             sessions: [[570, 960]], // 09:30 - 16:00
             unit: 1,
-            fallbackMop: 8.0941
+            fallbackMop: 8.0780
         },
         {
             code: 'EUR',
@@ -790,7 +745,7 @@ body {
             zone: 'Europe/Berlin',
             sessions: [[540, 1050]], // 09:00 - 17:30
             unit: 1,
-            fallbackMop: 8.8254
+            fallbackMop: 8.8126
         },
         {
             code: 'GBP',
@@ -800,7 +755,7 @@ body {
             zone: 'Europe/London',
             sessions: [[480, 990]], // 08:00 - 16:30
             unit: 1,
-            fallbackMop: 10.5532
+            fallbackMop: 10.5328
         },
         {
             code: 'CHF',
@@ -810,7 +765,7 @@ body {
             zone: 'Europe/Zurich',
             sessions: [[540, 1050]], // 09:00 - 17:30
             unit: 1,
-            fallbackMop: 9.6084
+            fallbackMop: 9.5866
         },
         {
             code: 'HKD',
@@ -820,7 +775,7 @@ body {
             zone: 'Asia/Hong_Kong',
             sessions: [[570, 720], [780, 960]], // 09:30 - 12:00, 13:00 - 16:00
             unit: 1,
-            fallbackMop: 1.0320
+            fallbackMop: 1.0300
         },
         {
             code: 'JPY',
@@ -830,7 +785,7 @@ body {
             zone: 'Asia/Tokyo',
             sessions: [[540, 690], [750, 930]], // 09:00 - 11:30, 12:30 - 15:30
             unit: 100,
-            fallbackMop: 5.0811
+            fallbackMop: 5.0686
         }
     ];
 
@@ -845,33 +800,14 @@ body {
         { id: 'syd', icon: '🦘', city: 'Sydney',    zone: 'Australia/Sydney', lat: -33.8688, lon: 151.2093 }
     ];
 
+    const HKD_TO_MOP_PEG = 1.03;
     const FX_STORAGE_KEY = 'zico_mop_rates_v1';
+    const FX_PREV_STORAGE_KEY = 'zico_mop_prev_close_v1';
     const WX_STORAGE_KEY = 'zico_weather_v1';
     const FX_POLL_MS = 60000;
     const WX_POLL_MS = 600000;
 
     let activeRange = '1D';
-    let previousMopRates = null;
-
-    function formatSyncClock(date = new Date()) {
-        return date.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        });
-    }
-
-    function setTelemetry(pillId, textId, label, isFallback = false) {
-        const pill = document.getElementById(pillId);
-        const text = document.getElementById(textId);
-        const dot = pill.querySelector('.live-dot');
-        text.textContent = label;
-        pill.classList.toggle('is-fallback', isFallback);
-        if (dot) {
-            dot.classList.toggle('amber', isFallback);
-        }
-    }
 
     async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
         const controller = new AbortController();
@@ -1101,10 +1037,89 @@ body {
     }
 
     /* =========================================
-       3. REAL-TIME MOP EXCHANGE RATES
+       3. REAL-TIME MOP EXCHANGE RATES & 24H CHANGE
        ========================================= */
 
-    function renderMopRates(mopRates, sourceName, isFallback) {
+    function convertHkdRatesToMop(rawRates, lowercaseKeys = false) {
+        if (!rawRates) return null;
+        const computed = {};
+        for (const market of MARKETS) {
+            if (market.code === 'HKD') {
+                computed.HKD = HKD_TO_MOP_PEG;
+                continue;
+            }
+            const key = lowercaseKeys ? market.code.toLowerCase() : market.code;
+            const perHkd = Number(rawRates[key]);
+            if (!Number.isFinite(perHkd) || perHkd <= 0) {
+                return null;
+            }
+            computed[market.code] = (market.unit / perHkd) * HKD_TO_MOP_PEG;
+        }
+        return computed;
+    }
+
+    async function fetchPreviousCloseMopRates() {
+        const todayUtc = new Date().toISOString().slice(0, 10);
+        const cached = readStorage(FX_PREV_STORAGE_KEY);
+        if (cached?.forToday === todayUtc && cached?.rates) {
+            return cached.rates;
+        }
+
+        // Primary historical benchmark: previous UTC trading snapshot in HKD base
+        try {
+            const latest = await fetchJsonWithTimeout(
+                'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/hkd.min.json'
+            );
+            let prevRaw = latest?.date && latest.date < todayUtc ? latest.hkd : null;
+
+            if (!prevRaw) {
+                for (let backDays = 1; backDays <= 3; backDays++) {
+                    const dt = new Date(Date.now() - backDays * 86400000).toISOString().slice(0, 10);
+                    try {
+                        const snap = await fetchJsonWithTimeout(
+                            `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dt}/v1/currencies/hkd.min.json`
+                        );
+                        if (snap?.date && snap.date < todayUtc && snap.hkd) {
+                            prevRaw = snap.hkd;
+                            break;
+                        }
+                    } catch {
+                        // Try previous date
+                    }
+                }
+            }
+
+            const converted = convertHkdRatesToMop(prevRaw, true);
+            if (converted) {
+                writeStorage(FX_PREV_STORAGE_KEY, { forToday: todayUtc, rates: converted });
+                return converted;
+            }
+        } catch {
+            // Fall through to Frankfurter ECB reference series
+        }
+
+        try {
+            const startDate = new Date(Date.now() - 5 * 86400000).toISOString().slice(0, 10);
+            const frank = await fetchJsonWithTimeout(
+                `https://api.frankfurter.dev/v1/${startDate}..?base=HKD&symbols=USD,EUR,GBP,CHF,JPY`
+            );
+            const dates = Object.keys(frank?.rates || {})
+                .filter((d) => d < todayUtc)
+                .sort();
+            const prevDate = dates[dates.length - 1];
+            const converted = convertHkdRatesToMop(prevDate ? frank.rates[prevDate] : null, false);
+            if (converted) {
+                writeStorage(FX_PREV_STORAGE_KEY, { forToday: todayUtc, rates: converted });
+                return converted;
+            }
+        } catch {
+            // Historical reference unavailable
+        }
+
+        return cached?.rates || null;
+    }
+
+    function renderMopRates(mopRates, prevCloseRates) {
         const track = document.getElementById('fx-track');
         const groupA = track.querySelector('[data-group="a"]');
         const groupB = track.querySelector('[data-group="b"]');
@@ -1113,34 +1128,40 @@ body {
             const frag = document.createDocumentFragment();
             MARKETS.forEach((market) => {
                 const rate = mopRates[market.code];
-                const prev = previousMopRates ? previousMopRates[market.code] : null;
-                const diff = prev != null ? rate - prev : 0;
+                const prev = prevCloseRates ? prevCloseRates[market.code] : null;
 
                 const item = document.createElement('span');
                 item.className = 'fx-item';
 
                 const unit = document.createElement('span');
                 unit.className = 'fx-unit';
-                unit.textContent = `${market.flag} ${market.unit} ${market.code} =`;
+                unit.textContent = `${market.flag} ${market.unit} ${market.code} = `;
 
                 const val = document.createElement('span');
                 val.className = 'fx-value tabular';
                 val.textContent = `${rate.toFixed(4)} MOP`;
 
-                const delta = document.createElement('span');
-                delta.className = 'fx-delta tabular';
-                if (prev == null || Math.abs(diff) < 0.00005) {
-                    delta.classList.add('is-flat');
-                    delta.textContent = '• 0.0000';
-                } else if (diff > 0) {
-                    delta.classList.add('is-up');
-                    delta.textContent = `▲ +${diff.toFixed(4)}`;
-                } else {
-                    delta.classList.add('is-down');
-                    delta.textContent = `▼ ${diff.toFixed(4)}`;
+                item.append(unit, val);
+
+                if (Number.isFinite(prev) && prev > 0) {
+                    const diff = rate - prev;
+                    const pct = (diff / prev) * 100;
+                    const delta = document.createElement('span');
+                    delta.className = 'fx-delta tabular';
+
+                    if (Math.abs(pct) < 0.005) {
+                        delta.classList.add('is-flat');
+                        delta.textContent = ' 0.00%';
+                    } else if (diff > 0) {
+                        delta.classList.add('is-up');
+                        delta.textContent = ` ▲ +${diff.toFixed(4)} (+${pct.toFixed(2)}%)`;
+                    } else {
+                        delta.classList.add('is-down');
+                        delta.textContent = ` ▼ ${diff.toFixed(4)} (${pct.toFixed(2)}%)`;
+                    }
+                    item.appendChild(delta);
                 }
 
-                item.append(unit, val, delta);
                 frag.appendChild(item);
             });
             return frag;
@@ -1158,53 +1179,31 @@ body {
                 chip.textContent = `${market.unit} ${market.code} = ${mopRates[market.code].toFixed(4)} MOP`;
             }
         });
-
-        previousMopRates = { ...mopRates };
-        setTelemetry('fx-status', 'fx-status-text', `${sourceName} ${formatSyncClock()}`, isFallback);
     }
 
-    async function fetchMopRates() {
+    async function fetchLiveHkdBaseMopRates() {
         const providers = [
             {
-                name: 'Coinbase',
-                url: 'https://api.coinbase.com/v2/exchange-rates?currency=MOP',
-                extract: (json) => json?.data?.rates
+                url: 'https://api.coinbase.com/v2/exchange-rates?currency=HKD',
+                extract: (json) => convertHkdRatesToMop(json?.data?.rates, false)
             },
             {
-                name: 'Open ER',
-                url: 'https://open.er-api.com/v6/latest/MOP',
-                extract: (json) => json?.rates
+                url: 'https://open.er-api.com/v6/latest/HKD',
+                extract: (json) => convertHkdRatesToMop(json?.rates, false)
             },
             {
-                name: 'FX CDN',
-                url: 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/mop.min.json',
-                extract: (json) => json?.mop
-                    ? Object.fromEntries(Object.entries(json.mop).map(([k, v]) => [k.toUpperCase(), v]))
-                    : null
+                url: 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/hkd.min.json',
+                extract: (json) => convertHkdRatesToMop(json?.hkd, true)
             }
         ];
 
         for (const provider of providers) {
             try {
                 const json = await fetchJsonWithTimeout(provider.url);
-                const rawRates = provider.extract(json);
-                if (!rawRates) continue;
-
-                const computed = {};
-                let valid = true;
-                for (const market of MARKETS) {
-                    const perMop = Number(rawRates[market.code]);
-                    if (!Number.isFinite(perMop) || perMop <= 0) {
-                        valid = false;
-                        break;
-                    }
-                    computed[market.code] = market.unit / perMop;
-                }
-
-                if (valid) {
+                const computed = provider.extract(json);
+                if (computed) {
                     writeStorage(FX_STORAGE_KEY, { rates: computed, savedAt: Date.now() });
-                    renderMopRates(computed, provider.name, false);
-                    return;
+                    return computed;
                 }
             } catch {
                 // Continue to next failover provider
@@ -1213,12 +1212,18 @@ body {
 
         const cached = readStorage(FX_STORAGE_KEY);
         if (cached?.rates) {
-            renderMopRates(cached.rates, 'Cached', true);
-            return;
+            return cached.rates;
         }
 
-        const baseline = Object.fromEntries(MARKETS.map((m) => [m.code, m.fallbackMop]));
-        renderMopRates(baseline, 'Baseline', true);
+        return Object.fromEntries(MARKETS.map((m) => [m.code, m.fallbackMop]));
+    }
+
+    async function fetchMopRates() {
+        const [prevCloseRates, liveRates] = await Promise.all([
+            fetchPreviousCloseMopRates(),
+            fetchLiveHkdBaseMopRates()
+        ]);
+        renderMopRates(liveRates, prevCloseRates);
     }
 
     /* =========================================
@@ -1241,7 +1246,7 @@ body {
         return { icon: '🌡️', label: 'Current' };
     }
 
-    function renderWeather(entries, sourceName, isFallback) {
+    function renderWeather(entries) {
         const track = document.getElementById('wx-track');
         const groupA = track.querySelector('[data-group="a"]');
         const groupB = track.querySelector('[data-group="b"]');
@@ -1278,8 +1283,6 @@ body {
         groupB.textContent = '';
         groupA.appendChild(buildGroup());
         groupB.appendChild(buildGroup());
-
-        setTelemetry('wx-status', 'wx-status-text', `${sourceName} ${formatSyncClock()}`, isFallback);
     }
 
     async function fetchWeather() {
@@ -1310,15 +1313,14 @@ body {
             });
 
             writeStorage(WX_STORAGE_KEY, { entries, savedAt: Date.now() });
-            renderWeather(entries, 'Open-Meteo', false);
+            renderWeather(entries);
             return;
         } catch {
             const cached = readStorage(WX_STORAGE_KEY);
             if (cached?.entries?.length) {
-                renderWeather(cached.entries, 'Cached', true);
+                renderWeather(cached.entries);
                 return;
             }
-            setTelemetry('wx-status', 'wx-status-text', 'Unavailable', true);
         }
     }
 

@@ -11,7 +11,7 @@ Live broadcast-style global markets, Macau Pataca (MOP) exchange rate, and multi
   - **CHF** — Swiss SMI 20 (`OANDA:CH20CHF`)
   - **HKD** — Hang Seng (`OANDA:HK33HKD`)
   - **JPY** — Nikkei 225 (`OANDA:JP225YJPY`)
-- **Real-Time MOP Exchange Rates**: Keyless 60-second polling against Coinbase public spot rates with automatic failover to Open ER-API, jsDelivr `@fawazahmed0/currency-api`, and `localStorage` caching, including live `▲` / `▼` delta indicators.
+- **Real-Time MOP Exchange Rates**: Keyless 60-second polling using live HKD cross-rates paired with the official `1 HKD = 1.0300 MOP` parity (automatic failover across Coinbase, Open ER-API, jsDelivr `@fawazahmed0/currency-api`, and `localStorage`), displaying real 24-hour daily changes and percentages against the previous close.
 - **Real-Time Multi-City Weather & Aligned World Clocks**: Batched live Open-Meteo conditions (temperature, feels-like, WMO day/night weather icons, humidity, and wind speed) paired with live `Intl.DateTimeFormat` clocks across 8 aligned financial hubs: New York, Frankfurt, London, Zurich, Hong Kong, Macau, Tokyo, and Sydney.
 - **Market Wire & Global Ticker Tape**: Continuous TradingView market stories sidebar alongside a top global indices, crypto, commodities, and FX ticker tape.
 
