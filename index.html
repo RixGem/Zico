@@ -110,6 +110,47 @@ body {
     animation: livePulse 2.2s ease-in-out infinite;
 }
 
+.sidebar-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.sidebar-sub {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.sidebar-tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wire-toggle {
+    border: 1px solid var(--rule);
+    background: var(--bg-abyss);
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: color 140ms ease, border-color 140ms ease;
+}
+
+.wire-toggle:hover {
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.wire-toggle:focus-visible {
+    outline: 2px solid var(--up-jade);
+    outline-offset: 1px;
+}
+
 .stories-frame {
     position: relative;
     width: 100%;
@@ -119,8 +160,106 @@ body {
     background: var(--bg-panel);
 }
 
-.stories-frame .tradingview-widget-container,
-.stories-frame .tradingview-widget-container__widget {
+.stories-frame::before,
+.stories-frame::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 40px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.stories-frame::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--bg-panel), rgba(11, 19, 32, 0));
+}
+
+.stories-frame::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--bg-panel), rgba(11, 19, 32, 0));
+}
+
+.wire-viewport {
+    height: 100%;
+    overflow: hidden;
+}
+
+.wire-track {
+    will-change: transform;
+    animation: wireScroll var(--wire-duration, 120s) linear infinite;
+}
+
+.wire-viewport:hover .wire-track,
+.wire-viewport:focus-within .wire-track,
+#stories-sidebar.is-paused .wire-track,
+#stories-sidebar.is-paused .wire-fallback {
+    animation-play-state: paused;
+}
+
+.wire-list {
+    list-style: none;
+}
+
+.wire-item {
+    border-bottom: 1px solid var(--rule);
+}
+
+.wire-link {
+    display: block;
+    padding: 14px 16px 16px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.wire-link:hover .wire-headline {
+    color: #FFFFFF;
+    text-decoration: underline;
+    text-decoration-color: rgba(148, 163, 184, 0.55);
+    text-underline-offset: 3px;
+}
+
+.wire-link:focus-visible {
+    outline: 2px solid var(--up-jade);
+    outline-offset: -2px;
+}
+
+.wire-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.wire-source {
+    color: #93C5FD;
+}
+
+.wire-headline {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.wire-status {
+    padding: 18px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.wire-fallback {
+    height: 200%;
+    animation: wireFallback 90s ease-in-out infinite alternate;
+}
+
+.wire-fallback .tradingview-widget-container,
+.wire-fallback .tradingview-widget-container__widget {
     width: 100%;
     height: 100%;
 }
@@ -131,7 +270,7 @@ body {
 
 #main-stack {
     display: grid;
-    grid-template-rows: 72px 42px 1fr 8.2vh 9.0vh 8.2vh;
+    grid-template-rows: auto 52px minmax(0, 1fr) 8.2vh 9.0vh 8.2vh;
     min-width: 0;
     min-height: 0;
     background: var(--rule);
@@ -139,30 +278,65 @@ body {
 }
 
 /* =========================================
-   ROW 1: GLOBAL TICKER TAPE
+   ROW 1: ENLARGED TWO-DECK MARKETS TICKER
    ========================================= */
 
-#ticker-band {
-    background: var(--bg-header);
-    overflow: hidden;
+#ticker-deck {
+    display: grid;
+    grid-template-rows: repeat(2, 76px);
+    gap: 1px;
+    background: var(--rule);
     min-width: 0;
-    min-height: 0;
 }
 
-#ticker-band .tradingview-widget-container,
-#ticker-band .tradingview-widget-container__widget {
+.tape-row {
+    display: grid;
+    grid-template-columns: 118px minmax(0, 1fr);
+    background: var(--bg-header);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.tape-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 14px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+    border-right: 1px solid var(--rule);
+    background: rgba(6, 11, 18, 0.45);
+}
+
+.tape-label small {
+    margin-top: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.tape-slot {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.tape-slot .tradingview-widget-container {
     width: 100%;
-    height: 100%;
 }
 
 /* =========================================
-   ROW 2: DESK CONTROL BAR
+   ROW 2: DESK BAR & CASH SESSION BOARD
    ========================================= */
 
 #control-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
     padding: 0 16px;
     background: var(--bg-header);
     min-width: 0;
@@ -186,112 +360,30 @@ body {
     font-size: 13px;
     color: var(--text-secondary);
     white-space: nowrap;
-}
-
-.desk-controls {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.range-group {
-    display: inline-flex;
-    background: var(--bg-abyss);
-    border: 1px solid var(--rule);
-    padding: 2px;
-    gap: 2px;
-}
-
-.range-btn {
-    border: 0;
-    background: transparent;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 11px;
-    cursor: pointer;
-    transition: background-color 140ms ease, color 140ms ease;
-}
-
-.range-btn:hover {
-    color: var(--text-primary);
-}
-
-.range-btn:focus-visible {
-    outline: 2px solid var(--up-jade);
-    outline-offset: 1px;
-}
-
-.range-btn[aria-pressed="true"] {
-    background: var(--up-jade);
-    color: var(--bg-abyss);
-}
-
-/* =========================================
-   ROW 3: 3x2 CURRENCY-MATCHED INDEX STAGE
-   ========================================= */
-
-#charts-stage {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-    gap: 1px;
-    background: var(--rule);
-    min-width: 0;
-    min-height: 0;
-    overflow: hidden;
-}
-
-.market-cell {
-    display: grid;
-    grid-template-rows: 36px 1fr;
-    background: var(--bg-panel);
-    min-width: 0;
-    min-height: 0;
-    overflow: hidden;
-}
-
-.market-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    background: var(--bg-header);
-    border-bottom: 1px solid var(--rule);
-    gap: 8px;
-    min-width: 0;
-}
-
-.market-id {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    min-width: 0;
-}
-
-.market-flag {
-    font-size: 16px;
-    line-height: 1;
-}
-
-.market-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.session-board {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+}
+
 .session-pill {
     display: inline-flex;
-    align-items: center;
-    padding: 2px 7px;
-    font-size: 11px;
+    align-items: baseline;
+    gap: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
     font-weight: 600;
     border: 1px solid transparent;
     white-space: nowrap;
+}
+
+.session-city {
+    color: var(--text-primary);
 }
 
 .session-pill.is-open {
@@ -312,27 +404,14 @@ body {
     border-color: var(--rule);
 }
 
-.market-mop-chip {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--up-jade);
-    white-space: nowrap;
-}
+/* =========================================
+   ROW 3: OPEN STAGE (INTENTIONAL NEGATIVE SPACE)
+   ========================================= */
 
-.chart-slot {
-    position: relative;
-    width: 100%;
-    height: 100%;
+#open-stage {
+    background: var(--bg-abyss);
     min-width: 0;
     min-height: 0;
-    overflow: hidden;
-    background: var(--bg-panel);
-}
-
-.chart-slot .tradingview-widget-container,
-.chart-slot .tradingview-widget-container__widget {
-    width: 100%;
-    height: 100%;
 }
 
 /* =========================================
@@ -536,18 +615,52 @@ body {
     }
 }
 
+@keyframes wireScroll {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(0, -50%, 0);
+    }
+}
+
+@keyframes wireFallback {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(0, -50%, 0);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .marquee-track {
+    .marquee-track,
+    .wire-track,
+    .wire-fallback {
         animation: none !important;
     }
     .marquee-viewport {
         overflow-x: auto;
     }
-    .marquee-group[aria-hidden="true"] {
+    .wire-viewport {
+        overflow-y: auto;
+    }
+    .wire-fallback {
+        height: 100%;
+    }
+    .marquee-group[aria-hidden="true"],
+    .wire-list[aria-hidden="true"] {
         display: none;
     }
     .live-dot {
         animation: none;
+    }
+}
+
+/* Short broadcast screens (e.g. 1366x768): keep the ticker deck compact */
+@media (max-height: 860px) and (min-width: 1025px) {
+    #ticker-deck {
+        grid-template-rows: repeat(2, 66px);
     }
 }
 
@@ -567,34 +680,42 @@ body {
 
     #stories-sidebar {
         order: 2;
-        height: 460px;
+        height: 480px;
     }
 
     #main-stack {
         order: 1;
-        grid-template-rows: 72px auto auto 58px 62px 58px;
+        grid-template-rows: auto auto 58px 62px 58px;
     }
 
     #control-bar {
         flex-wrap: wrap;
         gap: 8px;
-        padding: 8px 12px;
+        padding: 10px 12px;
     }
 
-    #charts-stage {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-template-rows: repeat(3, 240px);
+    .session-board {
+        flex-wrap: wrap;
     }
 
-    .ticker-band {
-        grid-template-columns: 92px 1fr;
+    #open-stage {
+        display: none;
+    }
+
+    .ticker-band,
+    .tape-row {
+        grid-template-columns: 92px minmax(0, 1fr);
+    }
+
+    .tape-label {
+        font-size: 13px;
+        padding: 0 10px;
     }
 }
 
 @media (max-width: 640px) {
-    #charts-stage {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(6, 220px);
+    .desk-title {
+        white-space: normal;
     }
 
     .desk-sub {
@@ -602,88 +723,56 @@ body {
     }
 }
 </style>
+
 </head>
 
 <body>
 
 <div id="dashboard">
 
-    <!-- LEFT SIDEBAR: LIVE MARKET WIRE -->
-    <aside id="stories-sidebar" aria-label="Market wire">
+    <!-- LEFT SIDEBAR: TOP STORIES / MARKET WIRE (VERTICAL AUTO-SCROLL) -->
+    <aside id="stories-sidebar" aria-labelledby="wire-title">
         <div class="sidebar-head">
-            <span class="sidebar-title">Market wire</span>
-            <span class="live-tag"><span class="live-dot" aria-hidden="true"></span>Live</span>
-        </div>
-        <div class="stories-frame">
-            <div class="tradingview-widget-container" id="stories-widget">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
-                {
-                    "feedMode": "all_symbols",
-                    "displayMode": "regular",
-                    "isTransparent": true,
-                    "colorTheme": "dark",
-                    "locale": "en",
-                    "width": "100%",
-                    "height": "100%"
-                }
-                </script>
+            <div class="sidebar-heading">
+                <h2 class="sidebar-title" id="wire-title">Top stories</h2>
+                <span class="sidebar-sub">Market wire</span>
             </div>
+            <div class="sidebar-tools">
+                <span class="live-tag"><span class="live-dot" aria-hidden="true"></span>Live</span>
+                <button type="button" class="wire-toggle" id="wire-toggle" aria-controls="wire-frame">Pause</button>
+            </div>
+        </div>
+        <div class="stories-frame" id="wire-frame">
+            <p class="wire-status" role="status">Loading headlines…</p>
         </div>
     </aside>
 
     <!-- RIGHT MAIN BROADCAST STAGE -->
     <main id="main-stack">
 
-        <!-- ROW 1: TOP GLOBAL TICKER TAPE -->
-        <section id="ticker-band" aria-label="Global market ticker tape">
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-                {
-                    "symbols": [
-                        {"proName": "OANDA:SPX500USD", "title": "S&P 500"},
-                        {"proName": "NASDAQ:QQQ", "title": "Nasdaq 100"},
-                        {"proName": "OANDA:EU50EUR", "title": "Euro Stoxx 50"},
-                        {"proName": "OANDA:UK100GBP", "title": "FTSE 100"},
-                        {"proName": "OANDA:CH20CHF", "title": "Swiss SMI 20"},
-                        {"proName": "OANDA:HK33HKD", "title": "Hang Seng"},
-                        {"proName": "OANDA:JP225YJPY", "title": "Nikkei 225"},
-                        {"proName": "BITSTAMP:BTCUSD", "title": "Bitcoin"},
-                        {"proName": "BITSTAMP:ETHUSD", "title": "Ethereum"},
-                        {"proName": "OANDA:XAUUSD", "title": "Gold"},
-                        {"proName": "OANDA:XAGUSD", "title": "Silver"},
-                        {"proName": "FX_IDC:EURUSD", "title": "EUR/USD"},
-                        {"proName": "FX_IDC:USDJPY", "title": "USD/JPY"}
-                    ],
-                    "showSymbolLogo": true,
-                    "isTransparent": false,
-                    "displayMode": "compact",
-                    "colorTheme": "dark",
-                    "locale": "en"
-                }
-                </script>
+        <!-- ROW 1: ENLARGED TWO-DECK MARKETS TICKER -->
+        <section id="ticker-deck" aria-label="Global markets ticker">
+            <div class="tape-row">
+                <div class="tape-label">Indices<small>and equities</small></div>
+                <div class="tape-slot" id="tape-indices"></div>
+            </div>
+            <div class="tape-row">
+                <div class="tape-label">FX majors<small>and macro</small></div>
+                <div class="tape-slot" id="tape-macro"></div>
             </div>
         </section>
 
-        <!-- ROW 2: CONTROL & TELEMETRY STRIP -->
+        <!-- ROW 2: DESK BAR & CASH SESSION BOARD -->
         <header id="control-bar">
             <div class="desk-brand">
                 <h1 class="desk-title">Zico — Macau FX &amp; Global Index Desk</h1>
-                <span class="desk-sub">Currency-matched benchmark indices, live MOP spot, and hub weather</span>
+                <span class="desk-sub">Live indices, FX majors, MOP spot and hub weather</span>
             </div>
-
-            <div class="desk-controls">
-                <div class="range-group" role="group" aria-label="Index chart timeframe">
-                    <button type="button" class="range-btn" data-range="1D" aria-pressed="true">1D</button>
-                    <button type="button" class="range-btn" data-range="1M" aria-pressed="false">1M</button>
-                    <button type="button" class="range-btn" data-range="12M" aria-pressed="false">1Y</button>
-                </div>
-            </div>
+            <ul class="session-board" id="session-board" aria-label="Cash market sessions"></ul>
         </header>
 
-        <!-- ROW 3: 3x2 CURRENCY-MATCHED INDEX CHARTS -->
-        <section id="charts-stage" aria-label="Currency-matched stock index charts"></section>
+        <!-- ROW 3: OPEN STAGE (intentionally left blank) -->
+        <div id="open-stage" aria-hidden="true"></div>
 
         <!-- ROW 4: WORLD CLOCKS MARQUEE -->
         <section class="ticker-band band-clock" aria-label="World clocks">
@@ -722,6 +811,7 @@ body {
 
 </div>
 
+
 <script>
 (() => {
     'use strict';
@@ -731,7 +821,7 @@ body {
             code: 'USD',
             flag: '🇺🇸',
             indexName: 'S&P 500',
-            symbol: 'OANDA:SPX500USD',
+            city: 'New York',
             zone: 'America/New_York',
             sessions: [[570, 960]], // 09:30 - 16:00
             unit: 1,
@@ -741,7 +831,7 @@ body {
             code: 'EUR',
             flag: '🇪🇺',
             indexName: 'Euro Stoxx 50',
-            symbol: 'OANDA:EU50EUR',
+            city: 'Frankfurt',
             zone: 'Europe/Berlin',
             sessions: [[540, 1050]], // 09:00 - 17:30
             unit: 1,
@@ -751,7 +841,7 @@ body {
             code: 'GBP',
             flag: '🇬🇧',
             indexName: 'FTSE 100',
-            symbol: 'OANDA:UK100GBP',
+            city: 'London',
             zone: 'Europe/London',
             sessions: [[480, 990]], // 08:00 - 16:30
             unit: 1,
@@ -761,7 +851,7 @@ body {
             code: 'CHF',
             flag: '🇨🇭',
             indexName: 'Swiss SMI 20',
-            symbol: 'OANDA:CH20CHF',
+            city: 'Zurich',
             zone: 'Europe/Zurich',
             sessions: [[540, 1050]], // 09:00 - 17:30
             unit: 1,
@@ -771,7 +861,7 @@ body {
             code: 'HKD',
             flag: '🇭🇰',
             indexName: 'Hang Seng',
-            symbol: 'OANDA:HK33HKD',
+            city: 'Hong Kong',
             zone: 'Asia/Hong_Kong',
             sessions: [[570, 720], [780, 960]], // 09:30 - 12:00, 13:00 - 16:00
             unit: 1,
@@ -781,7 +871,7 @@ body {
             code: 'JPY',
             flag: '🇯🇵',
             indexName: 'Nikkei 225',
-            symbol: 'OANDA:JP225YJPY',
+            city: 'Tokyo',
             zone: 'Asia/Tokyo',
             sessions: [[540, 690], [750, 930]], // 09:00 - 11:30, 12:30 - 15:30
             unit: 100,
@@ -806,8 +896,6 @@ body {
     const WX_STORAGE_KEY = 'zico_weather_v1';
     const FX_POLL_MS = 60000;
     const WX_POLL_MS = 600000;
-
-    let activeRange = '1D';
 
     async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
         const controller = new AbortController();
@@ -841,7 +929,105 @@ body {
     }
 
     /* =========================================
-       1. CURRENCY-MATCHED 3x2 INDEX CHARTS
+       1. ENLARGED MARKETS TICKER DECK
+       ========================================= */
+
+    const TAPE_INDICES = [
+        { proName: 'OANDA:SPX500USD', title: 'S&P 500' },
+        { proName: 'FOREXCOM:NSXUSD', title: 'Nasdaq 100' },
+        { proName: 'OANDA:US30USD', title: 'Dow Jones (US30)' },
+        { proName: 'OANDA:EU50EUR', title: 'Euro Stoxx 50' },
+        { proName: 'OANDA:UK100GBP', title: 'FTSE 100' },
+        { proName: 'OANDA:DE30EUR', title: 'DAX 40' },
+        { proName: 'OANDA:CH20CHF', title: 'Swiss SMI 20' },
+        { proName: 'OANDA:HK33HKD', title: 'Hang Seng' },
+        { proName: 'OANDA:JP225YJPY', title: 'Nikkei 225' },
+        { proName: 'NASDAQ:AAPL', title: 'Apple' },
+        { proName: 'NASDAQ:MSFT', title: 'Microsoft' },
+        { proName: 'NASDAQ:NVDA', title: 'Nvidia' },
+        { proName: 'NASDAQ:AMZN', title: 'Amazon' },
+        { proName: 'NASDAQ:GOOGL', title: 'Alphabet' },
+        { proName: 'NASDAQ:META', title: 'Meta' },
+        { proName: 'NASDAQ:TSLA', title: 'Tesla' },
+        { proName: 'NYSE:JPM', title: 'JPMorgan' },
+        { proName: 'NYSE:LVS', title: 'Las Vegas Sands' },
+        { proName: 'NASDAQ:WYNN', title: 'Wynn Resorts' },
+        { proName: 'NYSE:MGM', title: 'MGM Resorts' }
+    ];
+
+    const TAPE_MACRO = [
+        { proName: 'FX:EURUSD', title: 'EUR/USD' },
+        { proName: 'FX:USDJPY', title: 'USD/JPY' },
+        { proName: 'FX:GBPUSD', title: 'GBP/USD' },
+        { proName: 'FX:USDCHF', title: 'USD/CHF' },
+        { proName: 'FX:AUDUSD', title: 'AUD/USD' },
+        { proName: 'FX:USDCAD', title: 'USD/CAD' },
+        { proName: 'FX:NZDUSD', title: 'NZD/USD' },
+        { proName: 'FX:EURGBP', title: 'EUR/GBP' },
+        { proName: 'FX:EURJPY', title: 'EUR/JPY' },
+        { proName: 'FX_IDC:USDHKD', title: 'USD/HKD' },
+        { proName: 'FX:USDCNH', title: 'USD/CNH' },
+        { proName: 'OANDA:XAUUSD', title: 'Gold' },
+        { proName: 'OANDA:XAGUSD', title: 'Silver' },
+        { proName: 'OANDA:WTICOUSD', title: 'WTI Crude' },
+        { proName: 'OANDA:BCOUSD', title: 'Brent Crude' },
+        { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin' },
+        { proName: 'BITSTAMP:ETHUSD', title: 'Ethereum' }
+    ];
+
+    // The static "tickers" widget shows a limited number of symbols; keep the headline instruments first.
+    const STATIC_TICKER_LIMIT = 10;
+
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function mountTape(slotId, symbols) {
+        const slot = document.getElementById(slotId);
+        if (!slot) return;
+        slot.textContent = '';
+
+        const container = document.createElement('div');
+        container.className = 'tradingview-widget-container';
+
+        const widgetTarget = document.createElement('div');
+        widgetTarget.className = 'tradingview-widget-container__widget';
+
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+
+        if (reducedMotionQuery.matches) {
+            // Reduced motion: a static quote strip instead of the auto-scrolling tape
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-tickers.js';
+            script.textContent = JSON.stringify({
+                symbols: symbols.slice(0, STATIC_TICKER_LIMIT),
+                showSymbolLogo: true,
+                isTransparent: true,
+                colorTheme: 'dark',
+                locale: 'en'
+            });
+        } else {
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+            script.textContent = JSON.stringify({
+                symbols,
+                showSymbolLogo: true,
+                isTransparent: true,
+                displayMode: 'regular',
+                colorTheme: 'dark',
+                locale: 'en'
+            });
+        }
+
+        container.append(widgetTarget, script);
+        slot.appendChild(container);
+    }
+
+    function mountTickerDeck() {
+        mountTape('tape-indices', TAPE_INDICES);
+        mountTape('tape-macro', TAPE_MACRO);
+    }
+
+    /* =========================================
+       1b. CASH MARKET SESSION BOARD
        ========================================= */
 
     function getSessionState(market, now = new Date()) {
@@ -878,52 +1064,26 @@ body {
         return { label: 'Closed', cls: 'is-closed' };
     }
 
-    function buildChartStage() {
-        const stage = document.getElementById('charts-stage');
-        stage.textContent = '';
-
+    function buildSessionBoard() {
+        const board = document.getElementById('session-board');
+        board.textContent = '';
         MARKETS.forEach((market) => {
-            const cell = document.createElement('article');
-            cell.className = 'market-cell';
-            cell.dataset.code = market.code;
+            const pill = document.createElement('li');
+            pill.className = 'session-pill is-closed';
+            pill.id = `session-${market.code}`;
+            pill.title = market.indexName;
 
-            const head = document.createElement('div');
-            head.className = 'market-head';
+            const city = document.createElement('span');
+            city.className = 'session-city';
+            city.textContent = market.city;
 
-            const idWrap = document.createElement('div');
-            idWrap.className = 'market-id';
+            const state = document.createElement('span');
+            state.className = 'session-state';
 
-            const flag = document.createElement('span');
-            flag.className = 'market-flag';
-            flag.textContent = market.flag;
-
-            const name = document.createElement('span');
-            name.className = 'market-name';
-            name.textContent = market.indexName;
-
-            const session = document.createElement('span');
-            session.className = 'session-pill is-closed';
-            session.id = `session-${market.code}`;
-
-            idWrap.append(flag, name, session);
-
-            const mopChip = document.createElement('span');
-            mopChip.className = 'market-mop-chip tabular';
-            mopChip.id = `chart-mop-${market.code}`;
-            mopChip.textContent = `${market.unit} ${market.code} = ${market.fallbackMop.toFixed(4)} MOP`;
-
-            head.append(idWrap, mopChip);
-
-            const slot = document.createElement('div');
-            slot.className = 'chart-slot';
-            slot.id = `chart-slot-${market.code}`;
-
-            cell.append(head, slot);
-            stage.appendChild(cell);
+            pill.append(city, state);
+            board.appendChild(pill);
         });
-
         updateSessionPills();
-        mountAllCharts(activeRange);
     }
 
     function updateSessionPills() {
@@ -932,56 +1092,264 @@ body {
             const pill = document.getElementById(`session-${market.code}`);
             if (!pill) return;
             const state = getSessionState(market, now);
-            pill.textContent = state.label;
             pill.className = `session-pill ${state.cls}`;
+            const label = pill.querySelector('.session-state');
+            if (label.textContent !== state.label) {
+                label.textContent = state.label;
+            }
         });
     }
 
-    function mountAllCharts(dateRange) {
-        MARKETS.forEach((market) => {
-            const slot = document.getElementById(`chart-slot-${market.code}`);
-            if (!slot) return;
-            slot.textContent = '';
+    /* =========================================
+       1c. TOP STORIES WIRE (VERTICAL AUTO-SCROLL)
+       ========================================= */
 
-            const container = document.createElement('div');
-            container.className = 'tradingview-widget-container';
+    const RSS_PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=';
+    const WIRE_FEEDS = [
+        { source: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
+        { source: 'CNBC Finance', url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html' },
+        { source: 'CNBC Economy', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
+        { source: 'CNBC World', url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html' },
+        { source: 'BBC Business', url: 'https://feeds.bbci.co.uk/news/business/rss.xml' }
+    ];
+    const WIRE_STORAGE_KEY = 'zico_wire_v1';
+    const WIRE_POLL_MS = 600000;
+    const WIRE_MAX_ITEMS = 32;
+    const WIRE_MIN_ITEMS = 4;
+    const WIRE_SCROLL_PX_PER_SEC = 24;
+    const WIRE_FEED_STAGGER_MS = 400;
 
-            const widgetTarget = document.createElement('div');
-            widgetTarget.className = 'tradingview-widget-container__widget';
+    let wireSignature = '';
 
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
-            script.async = true;
-            script.textContent = JSON.stringify({
-                symbol: market.symbol,
-                width: '100%',
-                height: '100%',
-                locale: 'en',
-                dateRange,
-                colorTheme: 'dark',
-                isTransparent: true,
-                autosize: true,
-                largeChartUrl: '',
-                chartOnly: false
+    function parseFeedDate(raw) {
+        if (!raw) return NaN;
+        // rss2json returns UTC timestamps as "YYYY-MM-DD HH:MM:SS"
+        const iso = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw) ? `${raw.replace(' ', 'T')}Z` : raw;
+        return Date.parse(iso);
+    }
+
+    function decodeEntities(text) {
+        const area = document.createElement('textarea');
+        area.innerHTML = text;
+        return area.value;
+    }
+
+    function safeHttpUrl(raw) {
+        try {
+            const url = new URL(raw);
+            return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function formatAge(ts) {
+        if (!Number.isFinite(ts)) return '';
+        const mins = Math.max(0, Math.round((Date.now() - ts) / 60000));
+        if (mins < 1) return 'Just now';
+        if (mins < 60) return `${mins}m ago`;
+        const hours = Math.round(mins / 60);
+        if (hours < 24) return `${hours}h ago`;
+        return `${Math.round(hours / 24)}d ago`;
+    }
+
+    async function fetchWireStories() {
+        const results = await Promise.allSettled(WIRE_FEEDS.map(async (feed, idx) => {
+            // Stagger requests so the keyless proxy doesn't rate-limit (HTTP 429) a burst
+            await new Promise((resolve) => setTimeout(resolve, idx * WIRE_FEED_STAGGER_MS));
+            const json = await fetchJsonWithTimeout(`${RSS_PROXY}${encodeURIComponent(feed.url)}`, 9000);
+            if (json?.status !== 'ok' || !Array.isArray(json.items)) {
+                throw new Error(`Feed unavailable: ${feed.source}`);
+            }
+            return json.items.map((item) => ({
+                title: decodeEntities(String(item.title || '')).replace(/\s+/g, ' ').trim(),
+                link: safeHttpUrl(item.link),
+                source: feed.source,
+                ts: parseFeedDate(item.pubDate)
+            }));
+        }));
+
+        const seen = new Set();
+        const stories = [];
+        results.forEach((result) => {
+            if (result.status !== 'fulfilled') return;
+            result.value.forEach((story) => {
+                const key = story.title.toLowerCase();
+                if (!story.title || !story.link || seen.has(key)) return;
+                seen.add(key);
+                stories.push(story);
             });
+        });
 
-            container.append(widgetTarget, script);
-            slot.appendChild(container);
+        stories.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+        return stories.slice(0, WIRE_MAX_ITEMS);
+    }
+
+    function buildWireList(stories, isClone) {
+        const list = document.createElement('ul');
+        list.className = 'wire-list';
+        if (isClone) {
+            list.setAttribute('aria-hidden', 'true');
+        } else {
+            list.setAttribute('aria-label', 'Latest market headlines');
+        }
+
+        stories.forEach((story) => {
+            const item = document.createElement('li');
+            item.className = 'wire-item';
+
+            const link = document.createElement('a');
+            link.className = 'wire-link';
+            link.href = story.link;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            if (isClone) link.tabIndex = -1;
+
+            const meta = document.createElement('span');
+            meta.className = 'wire-meta';
+
+            const source = document.createElement('span');
+            source.className = 'wire-source';
+            source.textContent = story.source;
+
+            const time = document.createElement('time');
+            time.className = 'wire-time tabular';
+            if (Number.isFinite(story.ts)) {
+                time.dateTime = new Date(story.ts).toISOString();
+                time.dataset.ts = String(story.ts);
+                time.textContent = formatAge(story.ts);
+            }
+
+            meta.append(source, time);
+
+            const headline = document.createElement('span');
+            headline.className = 'wire-headline';
+            headline.textContent = story.title;
+
+            link.append(meta, headline);
+            item.appendChild(link);
+            list.appendChild(item);
+        });
+
+        return list;
+    }
+
+    function renderWire(stories) {
+        const signature = stories.map((s) => s.link).join('|');
+        if (signature === wireSignature) return;
+
+        const frame = document.getElementById('wire-frame');
+        // Don't yank the list out from under someone reading or tabbing through it
+        if (wireSignature && frame.matches(':hover, :focus-within')) return;
+        wireSignature = signature;
+
+        const viewport = document.createElement('div');
+        viewport.className = 'wire-viewport';
+
+        const track = document.createElement('div');
+        track.className = 'wire-track';
+        track.append(buildWireList(stories, false), buildWireList(stories, true));
+        viewport.appendChild(track);
+
+        frame.textContent = '';
+        frame.appendChild(viewport);
+
+        requestAnimationFrame(() => {
+            const loopHeight = track.firstElementChild.offsetHeight;
+            const seconds = Math.max(45, Math.round(loopHeight / WIRE_SCROLL_PX_PER_SEC));
+            track.style.setProperty('--wire-duration', `${seconds}s`);
         });
     }
 
-    function setupRangeButtons() {
-        const buttons = document.querySelectorAll('.range-btn');
-        buttons.forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const nextRange = btn.dataset.range;
-                if (!nextRange || nextRange === activeRange) return;
-                activeRange = nextRange;
-                buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-                mountAllCharts(activeRange);
-            });
+    function refreshWireAges() {
+        document.querySelectorAll('.wire-time[data-ts]').forEach((el) => {
+            el.textContent = formatAge(Number(el.dataset.ts));
         });
+    }
+
+    // Last resort when no headline feed or cache is reachable: TradingView stories, still auto-scrolled
+    function mountWireFallback() {
+        if (wireSignature === 'fallback') return;
+        wireSignature = 'fallback';
+
+        const frame = document.getElementById('wire-frame');
+        const viewport = document.createElement('div');
+        viewport.className = 'wire-viewport';
+
+        const mover = document.createElement('div');
+        mover.className = 'wire-fallback';
+
+        const container = document.createElement('div');
+        container.className = 'tradingview-widget-container';
+
+        const widgetTarget = document.createElement('div');
+        widgetTarget.className = 'tradingview-widget-container__widget';
+
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
+        script.async = true;
+        script.textContent = JSON.stringify({
+            feedMode: 'all_symbols',
+            displayMode: 'regular',
+            isTransparent: true,
+            colorTheme: 'dark',
+            locale: 'en',
+            width: '100%',
+            height: '100%'
+        });
+
+        container.append(widgetTarget, script);
+        mover.appendChild(container);
+        viewport.appendChild(mover);
+        frame.textContent = '';
+        frame.appendChild(viewport);
+    }
+
+    async function refreshWire() {
+        try {
+            const stories = await fetchWireStories();
+            if (stories.length >= WIRE_MIN_ITEMS) {
+                writeStorage(WIRE_STORAGE_KEY, { stories, savedAt: Date.now() });
+                renderWire(stories);
+                return;
+            }
+        } catch {
+            // Fall through to cache / fallback
+        }
+
+        const cached = readStorage(WIRE_STORAGE_KEY);
+        if (cached?.stories?.length) {
+            renderWire(cached.stories);
+            return;
+        }
+        mountWireFallback();
+    }
+
+    function setupWireToggle() {
+        const sidebar = document.getElementById('stories-sidebar');
+        const btn = document.getElementById('wire-toggle');
+        btn.addEventListener('click', () => {
+            const paused = !sidebar.classList.contains('is-paused');
+            sidebar.classList.toggle('is-paused', paused);
+            btn.textContent = paused ? 'Play' : 'Pause';
+        });
+        applyMotionPreference();
+    }
+
+    function applyMotionPreference() {
+        // With reduced motion the wire is a static, scrollable list, so the toggle is redundant
+        document.getElementById('wire-toggle').hidden = reducedMotionQuery.matches;
+    }
+
+    function initWire() {
+        const cached = readStorage(WIRE_STORAGE_KEY);
+        if (cached?.stories?.length) {
+            renderWire(cached.stories);
+        }
+        refreshWire();
+        setInterval(refreshWire, WIRE_POLL_MS);
+        setInterval(refreshWireAges, 60000);
     }
 
     /* =========================================
@@ -1171,14 +1539,6 @@ body {
         groupB.textContent = '';
         groupA.appendChild(buildGroup());
         groupB.appendChild(buildGroup());
-
-        // Sync live MOP spot into each of the 6 index chart headers
-        MARKETS.forEach((market) => {
-            const chip = document.getElementById(`chart-mop-${market.code}`);
-            if (chip) {
-                chip.textContent = `${market.unit} ${market.code} = ${mopRates[market.code].toFixed(4)} MOP`;
-            }
-        });
     }
 
     async function fetchLiveHkdBaseMopRates() {
@@ -1328,8 +1688,14 @@ body {
        BOOTSTRAP
        ========================================= */
 
-    buildChartStage();
-    setupRangeButtons();
+    mountTickerDeck();
+    reducedMotionQuery.addEventListener('change', () => {
+        mountTickerDeck();
+        applyMotionPreference();
+    });
+    buildSessionBoard();
+    setupWireToggle();
+    initWire();
     initClockMarkup();
     updateClocks();
     setInterval(updateClocks, 1000);
