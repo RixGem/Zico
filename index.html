@@ -64,7 +64,7 @@ body {
 }
 
 /* =========================================
-   LEFT SIDEBAR: MARKET WIRE
+   LEFT SIDEBAR: STATIC STORIES PANEL
    ========================================= */
 
 #stories-sidebar {
@@ -92,24 +92,6 @@ body {
     color: var(--text-primary);
 }
 
-.live-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--up-jade);
-}
-
-.live-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--up-jade);
-    box-shadow: 0 0 8px rgba(18, 184, 134, 0.7);
-    animation: livePulse 2.2s ease-in-out infinite;
-}
-
 .sidebar-heading {
     display: flex;
     flex-direction: column;
@@ -123,158 +105,11 @@ body {
     color: var(--text-secondary);
 }
 
-.sidebar-tools {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.wire-toggle {
-    border: 1px solid var(--rule);
-    background: var(--bg-abyss);
-    color: var(--text-secondary);
-    font-family: var(--font-ui);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    cursor: pointer;
-    transition: color 140ms ease, border-color 140ms ease;
-}
-
-.wire-toggle:hover {
-    color: var(--text-primary);
-    border-color: var(--text-secondary);
-}
-
-.wire-toggle:focus-visible {
-    outline: 2px solid var(--up-jade);
-    outline-offset: 1px;
-}
-
 .stories-frame {
-    position: relative;
     width: 100%;
     height: 100%;
     min-height: 0;
-    overflow: hidden;
     background: var(--bg-panel);
-}
-
-.stories-frame::before,
-.stories-frame::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 40px;
-    z-index: 2;
-    pointer-events: none;
-}
-
-.stories-frame::before {
-    top: 0;
-    background: linear-gradient(to bottom, var(--bg-panel), rgba(11, 19, 32, 0));
-}
-
-.stories-frame::after {
-    bottom: 0;
-    background: linear-gradient(to top, var(--bg-panel), rgba(11, 19, 32, 0));
-}
-
-.wire-viewport {
-    height: 100%;
-    overflow: hidden;
-}
-
-.wire-track {
-    will-change: transform;
-    animation: wireScroll var(--wire-duration, 120s) linear infinite;
-}
-
-.wire-viewport:hover .wire-track,
-.wire-viewport:focus-within .wire-track,
-#stories-sidebar.is-paused .wire-track,
-#stories-sidebar.is-paused .wire-fallback {
-    animation-play-state: paused;
-}
-
-/* Keyboard browsing: stop the loop and use native scroll so the focused headline is always visible */
-.stories-frame.is-browsing .wire-track {
-    animation: none;
-}
-
-.stories-frame.is-browsing .wire-viewport {
-    overflow-y: auto;
-}
-
-.stories-frame.is-browsing .wire-list[aria-hidden="true"] {
-    display: none;
-}
-
-.wire-list {
-    list-style: none;
-}
-
-.wire-item {
-    border-bottom: 1px solid var(--rule);
-}
-
-.wire-link {
-    display: block;
-    padding: 14px 16px 16px;
-    color: inherit;
-    text-decoration: none;
-}
-
-.wire-link:hover .wire-headline {
-    color: #FFFFFF;
-    text-decoration: underline;
-    text-decoration-color: rgba(148, 163, 184, 0.55);
-    text-underline-offset: 3px;
-}
-
-.wire-link:focus-visible {
-    outline: 2px solid var(--up-jade);
-    outline-offset: -2px;
-}
-
-.wire-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.wire-source {
-    color: #93C5FD;
-}
-
-.wire-headline {
-    display: block;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--text-primary);
-}
-
-.wire-status {
-    padding: 18px 16px;
-    font-size: 13px;
-    color: var(--text-secondary);
-}
-
-.wire-fallback {
-    height: 200%;
-    animation: wireFallback 90s ease-in-out infinite alternate;
-}
-
-.wire-fallback .tradingview-widget-container,
-.wire-fallback .tradingview-widget-container__widget {
-    width: 100%;
-    height: 100%;
 }
 
 /* =========================================
@@ -630,54 +465,15 @@ body {
     }
 }
 
-@keyframes livePulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.45;
-    }
-}
-
-@keyframes wireScroll {
-    0% {
-        transform: translate3d(0, 0, 0);
-    }
-    100% {
-        transform: translate3d(0, -50%, 0);
-    }
-}
-
-@keyframes wireFallback {
-    0% {
-        transform: translate3d(0, 0, 0);
-    }
-    100% {
-        transform: translate3d(0, -50%, 0);
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .marquee-track,
-    .wire-track,
-    .wire-fallback {
+    .marquee-track {
         animation: none !important;
     }
     .marquee-viewport {
         overflow-x: auto;
     }
-    .wire-viewport {
-        overflow-y: auto;
-    }
-    .wire-fallback {
-        height: 100%;
-    }
-    .marquee-group[aria-hidden="true"],
-    .wire-list[aria-hidden="true"] {
+    .marquee-group[aria-hidden="true"] {
         display: none;
-    }
-    .live-dot {
-        animation: none;
     }
 }
 
@@ -713,8 +509,7 @@ body {
     }
 
     #stories-sidebar {
-        order: 2;
-        height: 480px;
+        display: none;
     }
 
     #main-stack {
@@ -764,21 +559,15 @@ body {
 
 <div id="dashboard">
 
-    <!-- LEFT SIDEBAR: TOP STORIES / MARKET WIRE (VERTICAL AUTO-SCROLL) -->
+    <!-- LEFT SIDEBAR: STATIC STORIES PANEL (no live feeds) -->
     <aside id="stories-sidebar" aria-labelledby="wire-title">
         <div class="sidebar-head">
             <div class="sidebar-heading">
                 <h2 class="sidebar-title" id="wire-title">Top stories</h2>
                 <span class="sidebar-sub">Market wire</span>
             </div>
-            <div class="sidebar-tools">
-                <span class="live-tag"><span class="live-dot" aria-hidden="true"></span>Live</span>
-                <button type="button" class="wire-toggle" id="wire-toggle" aria-controls="wire-frame">Pause</button>
-            </div>
         </div>
-        <div class="stories-frame" id="wire-frame">
-            <p class="wire-status" role="status">Loading headlines…</p>
-        </div>
+        <div class="stories-frame"></div>
     </aside>
 
     <!-- RIGHT MAIN BROADCAST STAGE -->
@@ -1141,273 +930,6 @@ body {
     }
 
     /* =========================================
-       1c. TOP STORIES WIRE (VERTICAL AUTO-SCROLL)
-       ========================================= */
-
-    const RSS_PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=';
-    const WIRE_FEEDS = [
-        { source: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
-        { source: 'CNBC Finance', url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html' },
-        { source: 'CNBC Economy', url: 'https://www.cnbc.com/id/20910258/device/rss/rss.html' },
-        { source: 'CNBC World', url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html' },
-        { source: 'BBC Business', url: 'https://feeds.bbci.co.uk/news/business/rss.xml' }
-    ];
-    const WIRE_STORAGE_KEY = 'zico_wire_v1';
-    const WIRE_POLL_MS = 600000;
-    const WIRE_MAX_ITEMS = 32;
-    const WIRE_MIN_ITEMS = 4;
-    const WIRE_SCROLL_PX_PER_SEC = 24;
-    const WIRE_FEED_STAGGER_MS = 400;
-
-    let wireSignature = '';
-
-    function parseFeedDate(raw) {
-        if (!raw) return NaN;
-        // rss2json returns UTC timestamps as "YYYY-MM-DD HH:MM:SS"
-        const iso = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw) ? `${raw.replace(' ', 'T')}Z` : raw;
-        return Date.parse(iso);
-    }
-
-    function decodeEntities(text) {
-        const area = document.createElement('textarea');
-        area.innerHTML = text;
-        return area.value;
-    }
-
-    function safeHttpUrl(raw) {
-        try {
-            const url = new URL(raw);
-            return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
-        } catch {
-            return null;
-        }
-    }
-
-    function formatAge(ts) {
-        if (!Number.isFinite(ts)) return '';
-        const mins = Math.max(0, Math.round((Date.now() - ts) / 60000));
-        if (mins < 1) return 'Just now';
-        if (mins < 60) return `${mins}m ago`;
-        const hours = Math.round(mins / 60);
-        if (hours < 24) return `${hours}h ago`;
-        return `${Math.round(hours / 24)}d ago`;
-    }
-
-    async function fetchWireStories() {
-        const results = await Promise.allSettled(WIRE_FEEDS.map(async (feed, idx) => {
-            // Stagger requests so the keyless proxy doesn't rate-limit (HTTP 429) a burst
-            await new Promise((resolve) => setTimeout(resolve, idx * WIRE_FEED_STAGGER_MS));
-            const json = await fetchJsonWithTimeout(`${RSS_PROXY}${encodeURIComponent(feed.url)}`, 9000);
-            if (json?.status !== 'ok' || !Array.isArray(json.items)) {
-                throw new Error(`Feed unavailable: ${feed.source}`);
-            }
-            return json.items.map((item) => ({
-                title: decodeEntities(String(item.title || '')).replace(/\s+/g, ' ').trim(),
-                link: safeHttpUrl(item.link),
-                source: feed.source,
-                ts: parseFeedDate(item.pubDate)
-            }));
-        }));
-
-        const seen = new Set();
-        const stories = [];
-        results.forEach((result) => {
-            if (result.status !== 'fulfilled') return;
-            result.value.forEach((story) => {
-                const key = story.title.toLowerCase();
-                if (!story.title || !story.link || seen.has(key)) return;
-                seen.add(key);
-                stories.push(story);
-            });
-        });
-
-        stories.sort((a, b) => (b.ts || 0) - (a.ts || 0));
-        return stories.slice(0, WIRE_MAX_ITEMS);
-    }
-
-    function buildWireList(stories, isClone) {
-        const list = document.createElement('ul');
-        list.className = 'wire-list';
-        if (isClone) {
-            list.setAttribute('aria-hidden', 'true');
-        } else {
-            list.setAttribute('aria-label', 'Latest market headlines');
-        }
-
-        stories.forEach((story) => {
-            const item = document.createElement('li');
-            item.className = 'wire-item';
-
-            const link = document.createElement('a');
-            link.className = 'wire-link';
-            link.href = story.link;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            if (isClone) link.tabIndex = -1;
-
-            const meta = document.createElement('span');
-            meta.className = 'wire-meta';
-
-            const source = document.createElement('span');
-            source.className = 'wire-source';
-            source.textContent = story.source;
-
-            const time = document.createElement('time');
-            time.className = 'wire-time tabular';
-            if (Number.isFinite(story.ts)) {
-                time.dateTime = new Date(story.ts).toISOString();
-                time.dataset.ts = String(story.ts);
-                time.textContent = formatAge(story.ts);
-            }
-
-            meta.append(source, time);
-
-            const headline = document.createElement('span');
-            headline.className = 'wire-headline';
-            headline.textContent = story.title;
-
-            link.append(meta, headline);
-            item.appendChild(link);
-            list.appendChild(item);
-        });
-
-        return list;
-    }
-
-    function renderWire(stories) {
-        const signature = stories.map((s) => s.link).join('|');
-        if (signature === wireSignature) return;
-
-        const frame = document.getElementById('wire-frame');
-        // Don't yank the list out from under someone reading or tabbing through it
-        if (wireSignature && frame.matches(':hover, :focus-within')) return;
-        wireSignature = signature;
-
-        const viewport = document.createElement('div');
-        viewport.className = 'wire-viewport';
-
-        const track = document.createElement('div');
-        track.className = 'wire-track';
-        track.append(buildWireList(stories, false), buildWireList(stories, true));
-        viewport.appendChild(track);
-
-        frame.textContent = '';
-        frame.appendChild(viewport);
-
-        requestAnimationFrame(() => {
-            const loopHeight = track.firstElementChild.offsetHeight;
-            const seconds = Math.max(45, Math.round(loopHeight / WIRE_SCROLL_PX_PER_SEC));
-            track.style.setProperty('--wire-duration', `${seconds}s`);
-        });
-    }
-
-    function refreshWireAges() {
-        document.querySelectorAll('.wire-time[data-ts]').forEach((el) => {
-            el.textContent = formatAge(Number(el.dataset.ts));
-        });
-    }
-
-    // Last resort when no headline feed or cache is reachable: TradingView stories, still auto-scrolled
-    function mountWireFallback() {
-        if (wireSignature === 'fallback') return;
-        wireSignature = 'fallback';
-
-        const frame = document.getElementById('wire-frame');
-        const viewport = document.createElement('div');
-        viewport.className = 'wire-viewport';
-
-        const mover = document.createElement('div');
-        mover.className = 'wire-fallback';
-
-        const container = document.createElement('div');
-        container.className = 'tradingview-widget-container';
-
-        const widgetTarget = document.createElement('div');
-        widgetTarget.className = 'tradingview-widget-container__widget';
-
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js';
-        script.async = true;
-        script.textContent = JSON.stringify({
-            feedMode: 'all_symbols',
-            displayMode: 'regular',
-            isTransparent: true,
-            colorTheme: 'dark',
-            locale: 'en',
-            width: '100%',
-            height: '100%'
-        });
-
-        container.append(widgetTarget, script);
-        mover.appendChild(container);
-        viewport.appendChild(mover);
-        frame.textContent = '';
-        frame.appendChild(viewport);
-    }
-
-    async function refreshWire() {
-        try {
-            const stories = await fetchWireStories();
-            if (stories.length >= WIRE_MIN_ITEMS) {
-                writeStorage(WIRE_STORAGE_KEY, { stories, savedAt: Date.now() });
-                renderWire(stories);
-                return;
-            }
-        } catch {
-            // Fall through to cache / fallback
-        }
-
-        const cached = readStorage(WIRE_STORAGE_KEY);
-        if (cached?.stories?.length) {
-            renderWire(cached.stories);
-            return;
-        }
-        mountWireFallback();
-    }
-
-    function setupWireKeyboardBrowsing() {
-        const frame = document.getElementById('wire-frame');
-        frame.addEventListener('focusin', (event) => {
-            const link = event.target.closest('.wire-link');
-            if (!link || !link.matches(':focus-visible')) return;
-            frame.classList.add('is-browsing');
-            link.scrollIntoView({ block: 'nearest' });
-        });
-        frame.addEventListener('focusout', (event) => {
-            if (!frame.contains(event.relatedTarget)) {
-                frame.classList.remove('is-browsing');
-            }
-        });
-    }
-
-    function setupWireToggle() {
-        const sidebar = document.getElementById('stories-sidebar');
-        const btn = document.getElementById('wire-toggle');
-        btn.addEventListener('click', () => {
-            const paused = !sidebar.classList.contains('is-paused');
-            sidebar.classList.toggle('is-paused', paused);
-            btn.textContent = paused ? 'Play' : 'Pause';
-        });
-        applyMotionPreference();
-    }
-
-    function applyMotionPreference() {
-        // With reduced motion the wire is a static, scrollable list, so the toggle is redundant
-        document.getElementById('wire-toggle').hidden = reducedMotionQuery.matches;
-    }
-
-    function initWire() {
-        const cached = readStorage(WIRE_STORAGE_KEY);
-        if (cached?.stories?.length) {
-            renderWire(cached.stories);
-        }
-        refreshWire();
-        setInterval(refreshWire, WIRE_POLL_MS);
-        setInterval(refreshWireAges, 60000);
-    }
-
-    /* =========================================
        2. WORLD CLOCKS (ALIGNED 8 HUBS)
        ========================================= */
 
@@ -1744,14 +1266,10 @@ body {
        ========================================= */
 
     mountTickerDeck();
-    reducedMotionQuery.addEventListener('change', () => {
-        mountTickerDeck();
-        applyMotionPreference();
-    });
+    reducedMotionQuery.addEventListener('change', mountTickerDeck);
     buildSessionBoard();
-    setupWireToggle();
-    setupWireKeyboardBrowsing();
-    initWire();
+    // Drop headlines cached by the former live news wire
+    try { localStorage.removeItem('zico_wire_v1'); } catch { /* storage unavailable */ }
     initClockMarkup();
     updateClocks();
     setInterval(updateClocks, 1000);

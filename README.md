@@ -12,7 +12,7 @@ Live broadcast-style global markets, Macau Pataca (MOP) exchange rate, and multi
 - **Open Centre Stage**: The middle area is intentionally left as clean negative space.
 - **Real-Time MOP Exchange Rates**: Keyless 60-second polling using live HKD cross-rates paired with the official `1 HKD = 1.0300 MOP` parity (automatic failover across Coinbase, Open ER-API, jsDelivr `@fawazahmed0/currency-api`, and `localStorage`), displaying real 24-hour daily changes and percentages against the previous close.
 - **Real-Time Multi-City Weather & Aligned World Clocks**: Batched live Open-Meteo conditions (temperature, feels-like, WMO day/night weather icons, humidity, and wind speed) paired with live `Intl.DateTimeFormat` clocks across 8 aligned financial hubs: New York, Frankfurt, London, Zurich, Hong Kong, Macau, Tokyo, and Sydney.
-- **Top Stories Wire**: Vertically auto-scrolling headlines from CNBC and BBC Business RSS feeds (keyless via rss2json, deduplicated, newest first, cached in `localStorage`, refreshed every 10 minutes). Pauses on hover/focus and has a Pause/Play button; with `prefers-reduced-motion` it becomes a static scrollable list. Falls back to an auto-scrolled TradingView stories widget if no feed or cache is available.
+- **Stories Panel**: Static, intentionally empty left sidebar. No news feeds are fetched or scraped.
 
 ## Usage
 
