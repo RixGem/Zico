@@ -1,0 +1,2 @@
+window.ZICO_SECURITIES = [{"proName":"OANDA:SPX500USD","title":"S&P 500"},{"proName":"FOREXCOM:NSXUSD","title":"Nasdaq 100"},{"proName":"OANDA:US30USD","title":"Dow Jones / US30"},{"proName":"OANDA:EU50EUR","title":"Euro Stoxx 50"},{"proName":"OANDA:UK100GBP","title":"FTSE 100"},{"proName":"OANDA:DE30EUR","title":"DAX 40"},{"proName":"OANDA:CH20CHF","title":"Swiss SMI"},{"proName":"OANDA:HK33HKD","title":"Hang Seng"},{"proName":"OANDA:JP225YJPY","title":"Nikkei 225"}];
+window.ZICO_FX = [{"proName":"FX:EURUSD","title":"EUR/USD"}];
